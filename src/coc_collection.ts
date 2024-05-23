@@ -90,7 +90,7 @@ export const create_COC_tokens = async (
             // make sure to follow the schema from collection. Order matters
             encodedAttributes: {
               0: {
-                _: `Name: ${index}`,
+                _: `Rank: ${index}`,
               },
              
             },

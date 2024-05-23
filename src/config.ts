@@ -10,7 +10,9 @@ export const NFT_config = {
     collectionDescription: 'test deployment for the coc nft collection',
     tokenPrefix: 'COC',
     // imagesInParallel: require('os').cpus().length,
-    attributes: { name: 'Rank', required: true, values: ['King', "Queen", "Bishop", "Rook", "Knight","Pawn"] },
+    attributes: { 
+        name: 'Rank', required: true, values: ['King', "Queen", "Bishop", "Rook", "Knight","Pawn"] 
+    },
     desiredCount: 20,
     numberOfTokensGeneratedAtOnce: 10,
 
