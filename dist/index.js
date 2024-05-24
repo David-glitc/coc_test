@@ -20,7 +20,7 @@ async function main() {
     const Owner = account.address;
     console.log(`Running from: ${Owner}, url: ${NFT_config.endpoint}`);
     const sdk = new Sdk({ baseUrl: NFT_config.endpoint, signer: account.signer });
-    fs.writeFileSync("data.json", JSON.stringify("=============================== Data =============================", null, 2));
+    fs.writeFileSync("data.json", JSON.stringify("=============================== Data =============================\n\n", null, 2));
     console.log("===== Uploading Files =======");
     const rootdir = "C:/Users/lenovo/Desktop/Work/COC_TSETING/images";
     const RawFiles = fs.readdirSync(rootdir, { encoding: "binary" });
@@ -33,18 +33,18 @@ async function main() {
             };
             files.push(data);
         }
-        console.log(files);
+        console.log({ files });
     }
     if (files) {
         const { cid, fullUrl } = await sdk.ipfs.uploadFiles({ files });
-        const write_data = [
+        const write_data = ` NFTS = [
             {
-                'cid': cid,
-                'Fullurl': fullUrl
+                'cid': ${cid},
+                'Fullurl': ${fullUrl}
             }
-        ];
+        ]`;
         const words = JSON.stringify(write_data);
-        fs.appendFile("data.json,", words, () => {
+        fs.appendFile("data.json", words, () => {
             console.log("=========== ❤️😊😊😊 ================");
         });
     }

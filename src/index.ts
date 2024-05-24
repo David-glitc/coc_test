@@ -43,20 +43,20 @@ async function main() {
             }
             files.push(data)
         }
-        console.log(files)
+        console.log({files})
 
     }
     if (files) {
 
         const { cid, fullUrl } = await sdk.ipfs.uploadFiles({ files })
-        const write_data = [
+        const write_data = ` NFTS = [
             {
-                'cid': cid,
-                'Fullurl': fullUrl
+                'cid': ${cid},
+                'Fullurl': ${fullUrl}
             }
-        ]
+        ]`
       const words = JSON.stringify(write_data)
-        fs.appendFile("data.json,", words, ()=>{
+        fs.appendFile("data.json", words, ()=>{
             console.log("=========== ❤️😊😊😊 ================")
         })
     }

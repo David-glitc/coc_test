@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc" ,
-    "run": "pnpm run build && pnpm run start"
+    "coc": "pnpm run build && pnpm run start"
   },
   "devDependencies": {
     "@polkadot/api": "6.0.5",
