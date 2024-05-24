@@ -85,7 +85,7 @@ export const create_COC_tokens = async (
           owner: address,
           data: {
             image: {
-              url: `https://ipfs.unique.network/ipfs/Qmap7uz7JKZNovCdLfdDE3p4XA6shghdADS7EsHvLjL6jT/nft_image_${index}.png`,
+              url: `https://ipfs.unique.network/ipfs/Qmap7uz7JKZNovCdLfdDE3p4XA6shghdADS7EsHvLjL6jT/COC_${index}.png`,
             },
             // make sure to follow the schema from collection. Order matters
             encodedAttributes: {

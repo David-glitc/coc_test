@@ -8,47 +8,44 @@ async function main() {
         try {
             fs.writeFileSync("data.json", JSON.stringify(value, null, 2));
         }
-        catch (e) {
-            throw new Error(`error write value: ${e}`);
+        catch (error) {
+            throw new Error(`Error writing data: ${error}`);
         }
-        ;
     }
-    // Validate wallet and network
-    if (!NFT_config.ownerSeed || !NFT_config.endpoint)
-        throw new Error("Env not set");
+    // Validate wallet and network configuration
+    if (!NFT_config.ownerSeed || !NFT_config.endpoint) {
+        throw new Error("Environment variables not set");
+    }
     const account = Sr25519Account.fromUri(NFT_config.ownerSeed);
-    const Owner = account.address;
-    console.log(`Running from: ${Owner}, url: ${NFT_config.endpoint}`);
+    const ownerAddress = account.address;
+    console.log(`Running from: ${ownerAddress}, URL: ${NFT_config.endpoint}`);
     const sdk = new Sdk({ baseUrl: NFT_config.endpoint, signer: account.signer });
-    fs.writeFileSync("data.json", JSON.stringify("=============================== Data =============================\n\n", null, 2));
     console.log("===== Uploading Files =======");
-    const rootdir = "C:/Users/lenovo/Desktop/Work/COC_TSETING/images";
-    const RawFiles = fs.readdirSync(rootdir, { encoding: "binary" });
-    const files = [];
-    if (RawFiles.length >= 1) {
-        for (let i = 0; i < RawFiles.length; i++) {
-            const NftData = readFileSync(`${rootdir}/${RawFiles[i]}`);
-            const data = {
-                content: NftData, name: `${RawFiles[i]}`
-            };
-            files.push(data);
+    const rootDirectory = "C:/Users/lenovo/Desktop/Work/COC_TSETING/images";
+    const rawFiles = fs.readdirSync(rootDirectory, { encoding: "binary" });
+    const filesToUpload = [];
+    if (rawFiles.length > 0) {
+        for (const fileName of rawFiles) {
+            const nftData = readFileSync(`${rootDirectory}/${fileName}`);
+            filesToUpload.push({ content: nftData, name: fileName });
         }
-        console.log({ files });
+        console.log({ files: filesToUpload });
     }
-    if (files) {
-        const { cid, fullUrl } = await sdk.ipfs.uploadFiles({ files });
-        const write_data = ` NFTS = [
-            {
-                'cid': ${cid},
-                'Fullurl': ${fullUrl}
-            }
-        ]`;
-        const words = JSON.stringify(write_data);
-        fs.appendFile("data.json", words, () => {
-            console.log("=========== ❤️😊😊😊 ================");
-        });
+    if (filesToUpload.length > 0) {
+        const uploadResponse = await sdk.ipfs.uploadFiles({ files: filesToUpload });
+        const { cid, fullUrl } = uploadResponse;
+        const nftData = {
+            NFTs: [
+                {
+                    cid,
+                    fullUrl
+                }
+            ]
+        };
+        writeData(nftData);
+        console.log("=========== ❤️😊😊😊 ================");
     }
     console.log("====== DONE!!!!! ❤️😊👌🥷=======");
-    // const COC_Collection = create_COC_Collection(sdk, Owner)
+    // const cocCollection = create_COC_Collection(sdk, ownerAddress);
 }
 await main();
