@@ -1,15 +1,17 @@
 import { Sdk } from "@unique-nft/sdk";
 import { Sr25519Account } from "@unique-nft/sr25519";
 import { NFT_config } from "./config.js";
+import { create_COC_Collection, create_COC_tokens } from "./coc_collection.js";
 import { readFileSync } from "fs";
 import fs from "fs";
 async function main() {
     async function writeData(value) {
         try {
-            const DataFIle = JSON.parse(JSON.stringify(fs.readFileSync("data.json")));
-            if (DataFIle.cid || DataFIle.fullUrl) {
+            if (fs.existsSync("data.json")) {
+                const DataFIle = JSON.parse(JSON.stringify(fs.readFileSync("data.json")));
                 console.log(DataFIle);
-                fs.appendFile("data.json", JSON.stringify(value, null, 2), (err) => {
+                fs.appendFile("data.json", JSON.stringify(`,
+                    ${value}`, null, 2), (err) => {
                     if (err)
                         throw err;
                     console.log('The "data to append" was appended to file!');
@@ -46,12 +48,8 @@ async function main() {
         const uploadResponse = await sdk.ipfs.uploadFiles({ files: filesToUpload });
         const { cid, fullUrl } = uploadResponse;
         const nftData = {
-            NFTs: [
-                {
-                    "cid": cid,
-                    "fullUrl": fullUrl
-                }
-            ]
+            "cid": cid,
+            "fullUrl": fullUrl
         };
         writeData(nftData);
     }
@@ -60,11 +58,11 @@ async function main() {
         try {
             const data = fs.readFileSync('data.json', 'utf8');
             const jsonData = JSON.parse(data);
-            if (jsonData.cid || jsonData.fullUrl) {
+            if (jsonData) {
                 return jsonData;
             }
             else {
-                console.log('check Data file ');
+                console.log('check Data file ================ ');
             }
         }
         catch (error) {
@@ -77,17 +75,21 @@ async function main() {
     console.log('==========================================================');
     console.log(nftLink);
     console.log('==========================================================');
-    // console.log('========== creating collection ===========')
-    // const cocCollection = await create_COC_Collection(sdk, ownerAddress);
-    // console.log('===================== CREATED COLLECTION ===============')
-    // console.log(`collestion is is : ${cocCollection.toLocaleString}`)
-    // fs.writeFileSync("IdLogs.txt", "")
-    // fs.appendFile('IdLogs.txt', `
-    // {Last id : ${cocCollection.toString}}
-    // `, (err: any) => {
-    //     if (err) throw err;
-    //     console.log('The "data to append" was appended to file!');
-    // })
-    // console.log('===================== CREATED LOG FILE  ===============')
+    console.log('========== creating collection ===========');
+    const cocCollection = await create_COC_Collection(sdk, ownerAddress);
+    console.log('===================== CREATED COLLECTION ===============');
+    console.log(`collestion is is : ${cocCollection}`);
+    fs.writeFileSync("IdLogs.txt", "");
+    fs.appendFile('IdLogs.txt', `
+    {Last id : ${cocCollection}}
+    `, (err) => {
+        if (err)
+            throw err;
+        console.log('The "data to append" was appended to file!');
+    });
+    console.log('===================== CREATED LOG FILE  ===============');
+    console.log('===================== Cresting Tokens ==============');
+    const coc_tokens = await create_COC_tokens(sdk, ownerAddress, cocCollection, 9);
+    console.log(coc_tokens);
 }
 await main();

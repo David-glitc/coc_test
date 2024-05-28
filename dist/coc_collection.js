@@ -92,13 +92,13 @@ export const create_COC_Collection = async (sdk, address) => {
     return result.parsed?.collectionId;
 };
 export const create_COC_tokens = async (sdk, address, collectionId, amount) => {
-    const perBulk = 50; // amount of tokens to create per iteration
+    const perBulk = 2; // amount of tokens to create per iteration
     let created = 0;
     let tokens;
     while (created < amount) {
         // if target amount = 99
         // created = 50, toCreate will be lft as 49 - otherwise continue with bulks
-        let toCreate = amount - created;
+        let toCreate = 9;
         if (toCreate > perBulk)
             toCreate = perBulk;
         const tokensToCreate = [...new Array(toCreate)].map((_, index) => {
@@ -107,7 +107,7 @@ export const create_COC_tokens = async (sdk, address, collectionId, amount) => {
                 owner: address,
                 data: {
                     image: {
-                        url: `https://ipfs.unique.network/ipfs/Qmap7uz7JKZNovCdLfdDE3p4XA6shghdADS7EsHvLjL6jT/COC_${index}.png`,
+                        url: `https://ipfs.unique.network/ipfs/Qmappk5md8GQqsueCgP4ARuu1WNUyvoN4gLhJkdf9akk3b/COC_${index}.png`,
                     },
                     // make sure to follow the schema from collection. Order matters
                     encodedAttributes: {
