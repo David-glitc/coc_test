@@ -6,7 +6,19 @@ import fs from "fs";
 async function main() {
     async function writeData(value) {
         try {
-            fs.writeFileSync("data.json", JSON.stringify(value, null, 2));
+            const DataFIle = JSON.parse(JSON.stringify(fs.readFileSync("data.json")));
+            if (DataFIle.cid || DataFIle.fullUrl) {
+                console.log(DataFIle);
+                fs.appendFile("data.json", JSON.stringify(value, null, 2), (err) => {
+                    if (err)
+                        throw err;
+                    console.log('The "data to append" was appended to file!');
+                });
+            }
+            else {
+                console.log("No data File seen creating ome =================");
+                fs.writeFileSync("data.json", JSON.stringify(value, null, 2));
+            }
         }
         catch (error) {
             throw new Error(`Error writing data: ${error}`);
@@ -22,14 +34,13 @@ async function main() {
     const sdk = new Sdk({ baseUrl: NFT_config.endpoint, signer: account.signer });
     console.log("===== Uploading Files =======");
     const rootDirectory = "C:/Users/lenovo/Desktop/Work/COC_TSETING/images";
-    const rawFiles = fs.readdirSync(rootDirectory, { encoding: "binary" });
+    const rawFiles = fs.readdirSync(rootDirectory, { encoding: "binary" }).sort();
     const filesToUpload = [];
     if (rawFiles.length > 0) {
         for (const fileName of rawFiles) {
             const nftData = readFileSync(`${rootDirectory}/${fileName}`);
             filesToUpload.push({ content: nftData, name: fileName });
         }
-        console.log({ files: filesToUpload });
     }
     if (filesToUpload.length > 0) {
         const uploadResponse = await sdk.ipfs.uploadFiles({ files: filesToUpload });
@@ -37,15 +48,46 @@ async function main() {
         const nftData = {
             NFTs: [
                 {
-                    cid,
-                    fullUrl
+                    "cid": cid,
+                    "fullUrl": fullUrl
                 }
             ]
         };
         writeData(nftData);
-        console.log("=========== ❤️😊😊😊 ================");
     }
     console.log("====== DONE!!!!! ❤️😊👌🥷=======");
-    // const cocCollection = create_COC_Collection(sdk, ownerAddress);
+    function readData() {
+        try {
+            const data = fs.readFileSync('data.json', 'utf8');
+            const jsonData = JSON.parse(data);
+            if (jsonData.cid || jsonData.fullUrl) {
+                return jsonData;
+            }
+            else {
+                console.log('check Data file ');
+            }
+        }
+        catch (error) {
+            console.error(`Error reading data: ${error}`);
+        }
+    }
+    const nftLink = readData();
+    console.log(`$============{nftLink}=============`);
+    // const Cover_Picture_url = nftLink?.fullUrl
+    console.log('==========================================================');
+    console.log(nftLink);
+    console.log('==========================================================');
+    // console.log('========== creating collection ===========')
+    // const cocCollection = await create_COC_Collection(sdk, ownerAddress);
+    // console.log('===================== CREATED COLLECTION ===============')
+    // console.log(`collestion is is : ${cocCollection.toLocaleString}`)
+    // fs.writeFileSync("IdLogs.txt", "")
+    // fs.appendFile('IdLogs.txt', `
+    // {Last id : ${cocCollection.toString}}
+    // `, (err: any) => {
+    //     if (err) throw err;
+    //     console.log('The "data to append" was appended to file!');
+    // })
+    // console.log('===================== CREATED LOG FILE  ===============')
 }
 await main();

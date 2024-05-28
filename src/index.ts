@@ -1,16 +1,31 @@
-import { IpfsUploadMultipleRequest, IpfsUploadResponse, Sdk } from "@unique-nft/sdk";
+import { Sdk } from "@unique-nft/sdk";
 import { Sr25519Account } from "@unique-nft/sr25519";
 import { NFT_config } from "./config.js";
-import prompt from "prompt";
+import prompt, { colors } from "prompt";
 import { create_COC_Collection } from "./coc_collection.js";
 import { readFileSync } from "fs";
 import path from "path";
 import fs from "fs";
 
+export interface NftDataType {
+    cid: string;
+    fullUrl: string | undefined;
+}
+
 async function main() {
     async function writeData(value: { NFTs: { cid: string; fullUrl: string | undefined; }[]; }) {
         try {
-            fs.writeFileSync("data.json", JSON.stringify(value, null, 2));
+            const DataFIle :NftDataType = JSON.parse(JSON.stringify(fs.readFileSync("data.json")));
+            if (DataFIle.cid || DataFIle.fullUrl) {
+                console.log(DataFIle)
+                fs.appendFile("data.json", JSON.stringify(value, null, 2), (err: any) => {
+                    if (err) throw err;
+                    console.log('The "data to append" was appended to file!');
+                })
+            } else {
+                console.log("No data File seen creating ome =================")
+                fs.writeFileSync("data.json", JSON.stringify(value, null, 2));
+            }
         } catch (error) {
             throw new Error(`Error writing data: ${error}`);
         }
@@ -29,7 +44,7 @@ async function main() {
     console.log("===== Uploading Files =======");
 
     const rootDirectory = "C:/Users/lenovo/Desktop/Work/COC_TSETING/images";
-    const rawFiles = fs.readdirSync(rootDirectory, { encoding: "binary" });
+    const rawFiles = fs.readdirSync(rootDirectory, { encoding: "binary" }).sort();
     const filesToUpload = [];
 
     if (rawFiles.length > 0) {
@@ -37,7 +52,6 @@ async function main() {
             const nftData = readFileSync(`${rootDirectory}/${fileName}`);
             filesToUpload.push({ content: nftData, name: fileName });
         }
-        console.log({ files: filesToUpload });
     }
 
     if (filesToUpload.length > 0) {
@@ -47,18 +61,50 @@ async function main() {
         const nftData = {
             NFTs: [
                 {
-                    cid,
-                    fullUrl
+                   "cid": cid,
+                    "fullUrl": fullUrl
                 }
             ]
         };
 
         writeData(nftData);
-        console.log("=========== ❤️😊😊😊 ================");
     }
 
     console.log("====== DONE!!!!! ❤️😊👌🥷=======");
-    // const cocCollection = create_COC_Collection(sdk, ownerAddress);
+    function readData() {
+        try {
+          const data = fs.readFileSync('data.json', 'utf8');
+          const jsonData: NftDataType = JSON.parse(data);
+          if (jsonData.cid || jsonData.fullUrl) {
+            return jsonData;
+          } else {
+            console.log('check Data file ')
+          }
+        } catch (error) {
+          console.error(`Error reading data: ${error}`);
+        }
+      }
+    
+      const nftLink = readData();
+      console.log(`$============{nftLink}=============`)
+    
+    
+      // const Cover_Picture_url = nftLink?.fullUrl
+      console.log('==========================================================')
+      console.log(nftLink)
+      console.log('==========================================================')
+    // console.log('========== creating collection ===========')
+    // const cocCollection = await create_COC_Collection(sdk, ownerAddress);
+    // console.log('===================== CREATED COLLECTION ===============')
+    // console.log(`collestion is is : ${cocCollection.toLocaleString}`)
+    // fs.writeFileSync("IdLogs.txt", "")
+    // fs.appendFile('IdLogs.txt', `
+    // {Last id : ${cocCollection.toString}}
+    // `, (err: any) => {
+    //     if (err) throw err;
+    //     console.log('The "data to append" was appended to file!');
+    // })
+    // console.log('===================== CREATED LOG FILE  ===============')
 }
 
 await main();
